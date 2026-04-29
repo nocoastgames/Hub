@@ -1,19 +1,20 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import ReactGA from 'react-ga4';
 
-const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
-
-if (measurementId) {
-  ReactGA.initialize(measurementId);
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
 }
 
 export default function AnalyticsRouteTracker() {
   const location = useLocation();
 
   useEffect(() => {
-    if (measurementId) {
-      ReactGA.send({ hitType: 'pageview', page: location.pathname + location.search });
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'page_view', {
+        page_path: location.pathname + location.search,
+      });
     }
   }, [location]);
 
