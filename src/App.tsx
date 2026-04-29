@@ -22,7 +22,7 @@ export default function App() {
         <header className="bg-white border-b border-black/10 px-6 sm:px-10 py-6 flex items-center justify-between sticky top-0 z-10">
           <Link to="/" className="flex items-baseline gap-3 decoration-transparent">
             <h1 className="font-bold tracking-tighter uppercase text-2xl sm:text-3xl text-black">
-              Miller Launchpad
+              Miller Arcade Hub
             </h1>
             <span className="text-xs font-medium bg-black text-white px-2 py-0.5 rounded hidden sm:block">V2.0</span>
           </Link>
