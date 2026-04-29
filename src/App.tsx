@@ -29,9 +29,11 @@ export default function App() {
           <div className="flex gap-4 items-center">
             {user ? (
               <>
-                <Link to="/admin">
-                  <Button variant="outline" size="sm">Admin</Button>
-                </Link>
+                {user.email === 'mrenegar@gmail.com' && (
+                  <Link to="/admin">
+                    <Button variant="outline" size="sm">Admin</Button>
+                  </Link>
+                )}
                 <Button variant="ghost" size="sm" onClick={() => signOut(auth)}>Log Out</Button>
               </>
             ) : (

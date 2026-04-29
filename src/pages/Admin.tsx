@@ -11,12 +11,18 @@ export default function Admin({ user }: { user: User | null }) {
   const { applets, loading } = useApplets();
   const [editingApplet, setEditingApplet] = useState<Partial<AppletLink> | null>(null);
 
-  if (!user) {
+  if (!user || user.email !== 'mrenegar@gmail.com') {
     return (
       <div className="text-center py-20">
         <ShieldAlert className="w-16 h-16 mx-auto text-slate-400 mb-4" />
         <h2 className="text-2xl font-bold text-slate-800 mb-6">Staff Access Required</h2>
-        <Button onClick={() => signInWithPopup(auth, new GoogleAuthProvider())}>Sign In with Google</Button>
+        {!user ? (
+          <Button onClick={() => signInWithPopup(auth, new GoogleAuthProvider())}>Sign In with Google</Button>
+        ) : (
+          <p className="text-slate-600 font-medium pb-4">
+            You do not have permission to view this page. ({user.email})
+          </p>
+        )}
       </div>
     );
   }

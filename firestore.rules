@@ -12,7 +12,7 @@ service cloud.firestore {
     function existing() { return resource.data; }
     function isSignedIn() { return request.auth != null && request.auth.token.email_verified == true; }
     function isAdmin() { 
-      return isSignedIn() && (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) || request.auth.token.email == 'mrenegar@gmail.com'); 
+      return isSignedIn() && request.auth.token.email == 'mrenegar@gmail.com'; 
     }
 
     // Validation Blueprint for AppletLink
