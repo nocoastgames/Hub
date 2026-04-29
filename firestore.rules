@@ -24,7 +24,7 @@ service cloud.firestore {
         (data.get('thumbnailUrl', '') is string) && data.get('thumbnailUrl', '').size() <= 500 &&
         (data.get('description', '') is string) && data.get('description', '').size() <= 1000 &&
         data.category is string && (data.category == 'game' || data.category == 'utility') &&
-        data.createdAt is timestamp;
+        data.createdAt is number;
     }
 
     // Match /applets/{appletId}
@@ -33,7 +33,7 @@ service cloud.firestore {
       allow get: if isValidId(appletId);
       allow list: if true; // Public list
 
-      allow create: if isAdmin() && isValidId(appletId) && isValidAppletLink(incoming()) && incoming().createdAt == request.time;
+      allow create: if isAdmin() && isValidId(appletId) && isValidAppletLink(incoming());
       
       allow update: if isAdmin() && isValidId(appletId) && isValidAppletLink(incoming()) && (
         incoming().diff(existing()).affectedKeys().hasOnly(['title', 'url', 'thumbnailUrl', 'description', 'category'])
