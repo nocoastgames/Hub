@@ -29,6 +29,48 @@ export default function Admin({ user }: { user: User | null }) {
     setEditingApplet(null);
   };
 
+  const handleImagePick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxSize = 600;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxSize || height > maxSize) {
+          if (width > height) {
+            height *= maxSize / width;
+            width = maxSize;
+          } else {
+            width *= maxSize / height;
+            height = maxSize;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // Fill white background in case of transparent PNG
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          setEditingApplet(prev => prev ? { ...prev, thumbnailUrl: dataUrl } : null);
+        }
+      };
+      if (event.target?.result) {
+        img.src = event.target.result as string;
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       <div className="flex justify-between items-center bg-white p-8 rounded-[40px] shadow-sm border border-black/5">
@@ -104,13 +146,28 @@ export default function Admin({ user }: { user: User | null }) {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Thumbnail URL (optional)</label>
-                <Input 
-                  type="url"
-                  value={editingApplet.thumbnailUrl || ''} 
-                  onChange={e => setEditingApplet(prev => ({...prev!, thumbnailUrl: e.target.value}))} 
-                  placeholder="https://...png"
-                />
+                <label className="text-sm font-semibold text-slate-700">Thumbnail Image (optional)</label>
+                <div className="flex gap-2 items-center">
+                  <Input 
+                    type="url"
+                    value={editingApplet.thumbnailUrl || ''} 
+                    onChange={e => setEditingApplet(prev => ({...prev!, thumbnailUrl: e.target.value}))} 
+                    placeholder="https://...png or click upload"
+                    className="flex-1"
+                  />
+                  <div className="relative">
+                    <Button type="button" variant="outline">Upload</Button>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      onChange={handleImagePick}
+                    />
+                  </div>
+                </div>
+                {editingApplet.thumbnailUrl && editingApplet.thumbnailUrl.startsWith('data:image') && (
+                  <p className="text-xs text-orange-600 font-bold">Image attached! ({Math.round(editingApplet.thumbnailUrl.length / 1024)} KB)</p>
+                )}
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Description</label>
