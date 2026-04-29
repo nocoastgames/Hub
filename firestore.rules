@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Primitives
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isSignedIn() { return request.auth != null && request.auth.token.email_verified == true; }
+    function isAdmin() { 
+      return isSignedIn() && (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) || request.auth.token.email == 'mrenegar@gmail.com'); 
+    }
+
+    // Validation Blueprint for AppletLink
+    function isValidAppletLink(data) {
+      return data.keys().hasAll(['title', 'url', 'category', 'createdAt']) &&
+        data.keys().size() <= 6 &&
+        data.title is string && data.title.size() > 0 && data.title.size() <= 100 &&
+        data.url is string && data.url.size() > 0 && data.url.size() <= 500 &&
+        (data.get('thumbnailUrl', '') is string) && data.get('thumbnailUrl', '').size() <= 500 &&
+        (data.get('description', '') is string) && data.get('description', '').size() <= 1000 &&
+        data.category is string && (data.category == 'game' || data.category == 'utility') &&
+        data.createdAt is timestamp;
+    }
+
+    // Match /applets/{appletId}
+    match /applets/{appletId} {
+      // Anyone can see the links
+      allow get: if isValidId(appletId);
+      allow list: if true; // Public list
+
+      allow create: if isAdmin() && isValidId(appletId) && isValidAppletLink(incoming()) && incoming().createdAt == request.time;
+      
+      allow update: if isAdmin() && isValidId(appletId) && isValidAppletLink(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['title', 'url', 'thumbnailUrl', 'description', 'category'])
+      ) && incoming().createdAt == existing().createdAt;
+
+      allow delete: if isAdmin() && isValidId(appletId);
+    }
+
+    // Validation Blueprint for Admin
+    function isValidAdmin(data) {
+      return data.keys().hasAll(['email', 'createdAt']) &&
+        data.keys().size() == 2 &&
+        data.email is string && data.email.size() > 0 && data.email.size() <= 200 &&
+        data.createdAt is timestamp;
+    }
+
+    match /admins/{uid} {
+      allow get: if isValidId(uid) && isAdmin();
+      allow list: if isAdmin();
+      
+      // Only existing admins (or bootstrapped email) can add new admins
+      allow create: if isAdmin() && isValidId(uid) && isValidAdmin(incoming()) && incoming().createdAt == request.time;
+      allow delete: if isAdmin() && isValidId(uid);
+    }
+  }
+}

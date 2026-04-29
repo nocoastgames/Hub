@@ -1,0 +1,65 @@
+{
+  "entities": {
+    "AppletLink": {
+      "title": "Applet Link",
+      "description": "A link to a game or utility.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The title of the applet."
+        },
+        "url": {
+          "type": "string",
+          "description": "The URL of the applet."
+        },
+        "thumbnailUrl": {
+          "type": "string",
+          "description": "The URL of the thumbnail image."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the applet."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["game", "utility"],
+          "description": "The category of the applet."
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Server timestamp of creation."
+        }
+      },
+      "required": ["title", "url", "category", "createdAt"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "A user who has admin privileges.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "number"
+        }
+      },
+      "required": ["email", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/applets/{appletId}": {
+      "schema": {
+        "$ref": "#/entities/AppletLink"
+      },
+      "description": "Stores all applet links."
+    },
+    "/admins/{uid}": {
+      "schema": {
+        "$ref": "#/entities/Admin"
+      },
+      "description": "Stores admin users. Document ID is their Firebase Auth UID."
+    }
+  }
+}

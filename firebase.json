@@ -1,0 +1,4 @@
+{
+  "project": "demo-project",
+  "rules": "DRAFT_firestore.rules"
+}
