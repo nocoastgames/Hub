@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import Launchpad from './pages/Launchpad';
 import Admin from './pages/Admin';
+import AnalyticsRouteTracker from './components/AnalyticsRouteTracker';
 import { useEffect, useState } from 'react';
 import { auth } from './lib/firebase';
 import { onAuthStateChanged, User, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
@@ -18,6 +19,7 @@ export default function App() {
 
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <AnalyticsRouteTracker />
       <div className="min-h-screen bg-[#F7F7F5] font-sans text-[#1A1A1A]">
         <header className="bg-white border-b border-black/10 px-6 sm:px-10 py-6 flex items-center justify-between sticky top-0 z-10">
           <Link to="/" className="flex items-baseline gap-3 decoration-transparent">
