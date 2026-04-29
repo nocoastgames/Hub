@@ -10,6 +10,7 @@ export interface AppletLink {
   thumbnailUrl?: string;
   description?: string;
   category: 'game' | 'utility';
+  isHero?: boolean;
   createdAt: number;
 }
 
@@ -59,6 +60,7 @@ export async function saveApplet(applet: Omit<AppletLink, 'id' | 'createdAt'> & 
       thumbnailUrl: applet.thumbnailUrl || '',
       description: applet.description || '',
       category: applet.category,
+      isHero: applet.isHero || false,
       createdAt: isNew ? Date.now() : applet.createdAt,
     };
     await setDoc(doc(db, 'applets', id), dataToSave);

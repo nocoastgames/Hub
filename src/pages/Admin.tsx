@@ -5,7 +5,7 @@ import { useApplets, saveApplet, deleteApplet, AppletLink } from '../hooks/useAp
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
-import { Plus, Trash2, Edit2, ShieldAlert } from 'lucide-react';
+import { Plus, Trash2, Edit2, ShieldAlert, Star } from 'lucide-react';
 
 export default function Admin({ user }: { user: User | null }) {
   const { applets, loading } = useApplets();
@@ -214,6 +214,15 @@ export default function Admin({ user }: { user: User | null }) {
                 </a>
               </div>
               <div className="flex items-center gap-2 justify-center w-full sm:w-auto mt-2 sm:mt-0">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => saveApplet({ ...applet, isHero: !applet.isHero })}
+                  className={applet.isHero ? 'text-yellow-500 border-yellow-500 bg-yellow-50' : 'text-slate-400'}
+                  title={applet.isHero ? 'Remove Hero' : 'Make Hero'}
+                >
+                  <Star className="w-4 h-4" fill={applet.isHero ? 'currentColor' : 'none'} />
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => setEditingApplet(applet)}>
                   <Edit2 className="w-4 h-4" />
                 </Button>

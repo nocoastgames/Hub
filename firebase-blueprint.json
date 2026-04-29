@@ -26,6 +26,10 @@
           "enum": ["game", "utility"],
           "description": "The category of the applet."
         },
+        "isHero": {
+          "type": "boolean",
+          "description": "Whether the applet is featured as a hero."
+        },
         "createdAt": {
           "type": "number",
           "description": "Server timestamp of creation."

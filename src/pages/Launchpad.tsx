@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useApplets, AppletLink } from '../hooks/useApplets';
 import { Card, CardContent, CardTitle } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
-import { Search, Gamepad2, Wrench, Play } from 'lucide-react';
+import { Search, Gamepad2, Wrench, Play, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function Launchpad() {
@@ -14,8 +14,12 @@ export default function Launchpad() {
     (applet.description && applet.description.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const games = filteredApplets.filter(a => a.category === 'game');
-  const utilities = filteredApplets.filter(a => a.category === 'utility');
+  const heroApplets = filteredApplets.filter(a => a.isHero);
+  // We can either exclude hero applets from the normal list or keep them in both. 
+  // Often it's better to exclude them from the normal list if they are displayed as heroes.
+  const nonHeroes = filteredApplets.filter(a => !a.isHero);
+  const games = nonHeroes.filter(a => a.category === 'game');
+  const utilities = nonHeroes.filter(a => a.category === 'utility');
 
   return (
     <div className="space-y-12 pb-12">
@@ -47,6 +51,19 @@ export default function Launchpad() {
         <div className="text-center py-12 text-slate-400 font-medium text-lg">Loading...</div>
       ) : (
         <div className="space-y-12">
+          {heroApplets.length > 0 && (
+            <section className="space-y-6 px-4">
+              <h3 className="text-2xl font-serif italic text-black font-bold opacity-80 flex items-center gap-3">
+                <Star className="w-8 h-8 text-yellow-500 fill-yellow-500" /> Featured
+              </h3>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                {heroApplets.map(applet => (
+                  <HeroAppletCard key={applet.id} applet={applet} />
+                ))}
+              </div>
+            </section>
+          )}
+
           {games.length > 0 && (
              <AppletSection title="Cool Games" icon={<Gamepad2 className="w-8 h-8 text-orange-500" />} applets={games} />
           )}
@@ -109,7 +126,6 @@ function AppletSection({ title, icon, applets }: { title: string, icon: React.Re
                     {applet.category === 'game' ? '🎮' : '🛠️'}
                   </div>
                 )}
-                {applet.category === 'game' && <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A] z-10">Hot Feature</div>}
               </div>
               <CardContent className="p-6 flex-1 flex flex-col items-start text-left">
                 <CardTitle className="mb-2 text-[#1A1A1A] text-xl font-bold">{applet.title}</CardTitle>
@@ -126,4 +142,41 @@ function AppletSection({ title, icon, applets }: { title: string, icon: React.Re
       </motion.div>
     </section>
   )
+}
+
+function HeroAppletCard({ applet }: { applet: AppletLink }) {
+  return (
+    <motion.a 
+      variants={itemVariants}
+      href={applet.url} 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      className="group decoration-transparent"
+    >
+      <Card className="h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-xl shadow-md border border-orange-500/20 flex flex-col md:flex-row group p-0 overflow-hidden bg-white">
+        <div className="h-64 md:h-auto md:w-2/5 md:min-h-[300px] bg-[#E0E7FF] relative overflow-hidden flex items-center justify-center shrink-0">
+          {applet.thumbnailUrl ? (
+            <img src={applet.thumbnailUrl} alt={applet.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-8xl opacity-30">
+              {applet.category === 'game' ? '🎮' : '🛠️'}
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
+          <div className="absolute bottom-6 left-6 flex items-center gap-2">
+            <span className="bg-yellow-400 text-yellow-900 px-3 py-1 text-xs font-black uppercase tracking-widest rounded-full shadow-lg">Featured</span>
+          </div>
+        </div>
+        <CardContent className="p-8 flex-1 flex flex-col justify-center items-start text-left bg-gradient-to-br from-white to-orange-50/30">
+          <CardTitle className="mb-4 text-[#1A1A1A] text-3xl font-black tracking-tight">{applet.title}</CardTitle>
+          <p className="text-lg text-black/60 leading-relaxed mb-8 flex-1">
+            {applet.description || "No description provided. Click to explore this featured activity!"}
+          </p>
+          <div className="flex items-center gap-3 w-full sm:w-auto px-8 py-4 bg-orange-600 text-white rounded-full font-bold uppercase tracking-widest shadow-lg group-hover:bg-black group-hover:scale-105 transition-all text-center justify-center">
+            <Play className="w-5 h-5 fill-current" /> Play Now
+          </div>
+        </CardContent>
+      </Card>
+    </motion.a>
+  );
 }
