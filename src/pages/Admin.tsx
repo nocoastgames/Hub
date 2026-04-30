@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { User, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { useApplets, saveApplet, deleteApplet, AppletLink } from '../hooks/useApplets';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
-import { Plus, Trash2, Edit2, ShieldAlert, Star } from 'lucide-react';
+import { Plus, Trash2, Edit2, ShieldAlert, Star, Wrench } from 'lucide-react';
 
 export default function Admin({ user }: { user: User | null }) {
   const { applets, loading } = useApplets();
@@ -214,6 +214,15 @@ export default function Admin({ user }: { user: User | null }) {
                 </a>
               </div>
               <div className="flex items-center gap-2 justify-center w-full sm:w-auto mt-2 sm:mt-0">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => saveApplet({ ...applet, isDevelopment: !applet.isDevelopment })}
+                  className={applet.isDevelopment ? 'text-indigo-500 border-indigo-500 bg-indigo-50' : 'text-slate-400'}
+                  title={applet.isDevelopment ? 'Remove In Development' : 'Set In Development'}
+                >
+                  <Wrench className="w-4 h-4" />
+                </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 

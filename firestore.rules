@@ -18,12 +18,13 @@ service cloud.firestore {
     // Validation Blueprint for AppletLink
     function isValidAppletLink(data) {
       return data.keys().hasAll(['title', 'url', 'category', 'createdAt']) &&
-        data.keys().size() <= 7 &&
+        data.keys().size() <= 8 &&
         data.title is string && data.title.size() > 0 && data.title.size() <= 100 &&
         data.url is string && data.url.size() > 0 && data.url.size() <= 500 &&
         (data.get('thumbnailUrl', '') is string) && data.get('thumbnailUrl', '').size() <= 300000 &&
         (data.get('description', '') is string) && data.get('description', '').size() <= 1000 &&
         (data.get('isHero', false) is bool) &&
+        (data.get('isDevelopment', false) is bool) &&
         data.category is string && (data.category == 'game' || data.category == 'utility') &&
         data.createdAt is number;
     }
@@ -37,7 +38,7 @@ service cloud.firestore {
       allow create: if isAdmin() && isValidId(appletId) && isValidAppletLink(incoming());
       
       allow update: if isAdmin() && isValidId(appletId) && isValidAppletLink(incoming()) && (
-        incoming().diff(existing()).affectedKeys().hasOnly(['title', 'url', 'thumbnailUrl', 'description', 'category', 'isHero'])
+        incoming().diff(existing()).affectedKeys().hasOnly(['title', 'url', 'thumbnailUrl', 'description', 'category', 'isHero', 'isDevelopment'])
       ) && incoming().createdAt == existing().createdAt;
 
       allow delete: if isAdmin() && isValidId(appletId);

@@ -30,6 +30,10 @@
           "type": "boolean",
           "description": "Whether the applet is featured as a hero."
         },
+        "isDevelopment": {
+          "type": "boolean",
+          "description": "Whether the applet is in development."
+        },
         "createdAt": {
           "type": "number",
           "description": "Server timestamp of creation."

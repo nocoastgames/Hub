@@ -11,6 +11,7 @@ export interface AppletLink {
   description?: string;
   category: 'game' | 'utility';
   isHero?: boolean;
+  isDevelopment?: boolean;
   createdAt: number;
 }
 
@@ -51,8 +52,8 @@ export async function deleteApplet(id: string) {
 }
 
 export async function saveApplet(applet: Omit<AppletLink, 'id' | 'createdAt'> & { id?: string, createdAt?: number }) {
+  const isNew = !applet.id;
   try {
-    const isNew = !applet.id;
     const id = applet.id || crypto.randomUUID();
     const dataToSave = {
       title: applet.title,
@@ -61,6 +62,7 @@ export async function saveApplet(applet: Omit<AppletLink, 'id' | 'createdAt'> & 
       description: applet.description || '',
       category: applet.category,
       isHero: applet.isHero || false,
+      isDevelopment: applet.isDevelopment || false,
       createdAt: isNew ? Date.now() : applet.createdAt,
     };
     await setDoc(doc(db, 'applets', id), dataToSave);

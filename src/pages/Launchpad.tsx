@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useApplets, AppletLink } from '../hooks/useApplets';
 import { Card, CardContent, CardTitle } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
-import { Search, Gamepad2, Wrench, Play, Star } from 'lucide-react';
+import { Search, Gamepad2, Wrench, Play, Star, Hammer } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function Launchpad() {
@@ -14,10 +14,11 @@ export default function Launchpad() {
     (applet.description && applet.description.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const heroApplets = filteredApplets.filter(a => a.isHero);
+  const devApplets = filteredApplets.filter(a => a.isDevelopment);
+  const heroApplets = filteredApplets.filter(a => a.isHero && !a.isDevelopment);
   // We can either exclude hero applets from the normal list or keep them in both. 
   // Often it's better to exclude them from the normal list if they are displayed as heroes.
-  const nonHeroes = filteredApplets.filter(a => !a.isHero);
+  const nonHeroes = filteredApplets.filter(a => !a.isHero && !a.isDevelopment);
   const games = nonHeroes.filter(a => a.category === 'game');
   const utilities = nonHeroes.filter(a => a.category === 'utility');
 
@@ -72,6 +73,10 @@ export default function Launchpad() {
              <AppletSection title="Helpful Tools" icon={<Wrench className="w-8 h-8 text-emerald-500" />} applets={utilities} />
           )}
 
+          {devApplets.length > 0 && (
+             <AppletSection title="In Development" icon={<Hammer className="w-8 h-8 text-indigo-500" />} applets={devApplets} />
+          )}
+
           {!loading && filteredApplets.length === 0 && (
             <div className="text-center py-20 text-slate-500">
               <p className="text-xl font-semibold">No applets found.</p>
@@ -119,6 +124,11 @@ function AppletSection({ title, icon, applets }: { title: string, icon: React.Re
           >
             <Card className="h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-md border-black/5 flex flex-col group p-0">
               <div className="h-40 w-full bg-[#E0E7FF] relative overflow-hidden flex items-center justify-center">
+                {applet.isDevelopment && (
+                  <div className="absolute top-4 right-4 bg-indigo-600 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest z-10 shadow-md">
+                    In Development
+                  </div>
+                )}
                 {applet.thumbnailUrl ? (
                   <img src={applet.thumbnailUrl} alt={applet.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 ) : (
@@ -144,7 +154,7 @@ function AppletSection({ title, icon, applets }: { title: string, icon: React.Re
   )
 }
 
-function HeroAppletCard({ applet }: { applet: AppletLink }) {
+function HeroAppletCard({ applet }: { applet: AppletLink; key?: React.Key }) {
   return (
     <motion.a 
       variants={itemVariants}

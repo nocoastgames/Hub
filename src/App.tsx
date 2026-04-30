@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import Launchpad from './pages/Launchpad';
 import Admin from './pages/Admin';
